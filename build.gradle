@@ -1,0 +1,52 @@
+plugins {
+    id 'java'
+    id 'eclipse' // optional (to generate Eclipse project files)
+    id 'idea' // optional (to generate IntelliJ IDEA project files)
+    id "net.serenity-bdd.serenity-gradle-plugin" version "3.0.2"
+}
+
+defaultTasks 'clean', 'test', 'aggregate'
+
+repositories {
+    mavenCentral()
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+ext {
+    slf4jVersion = '1.7.7'
+    serenityCoreVersion = '3.0.2'
+    junitVersion = '5.8.1'
+    assertJVersion = '3.8.0'
+    logbackVersion = '1.2.3'
+}
+
+dependencies {
+    implementation "ch.qos.logback:logback-classic:${logbackVersion}"
+
+    testImplementation "net.serenity-bdd:serenity-core:${serenityCoreVersion}",
+            "net.serenity-bdd:serenity-junit5:${serenityCoreVersion}",
+            "net.serenity-bdd:serenity-screenplay:${serenityCoreVersion}",
+            "net.serenity-bdd:serenity-screenplay-webdriver:${serenityCoreVersion}",
+            "net.serenity-bdd:serenity-ensure:${serenityCoreVersion}",
+            platform("org.junit:junit-bom:${junitVersion}"),
+            'org.junit.jupiter:junit-jupiter',
+            "org.assertj:assertj-core:${assertJVersion}"
+}
+
+test {
+    useJUnitPlatform()
+    systemProperties System.getProperties()
+    maxParallelForks = 5
+    testLogging {
+        //
+        // Uncomment to show Serenity output to the console
+        //
+        // showStandardStreams = true
+        events "passed", "skipped", "failed"
+    }
+}
+gradle.startParameter.continueOnFailure = true
+
+test.finalizedBy(aggregate)
